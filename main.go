@@ -49,30 +49,30 @@ func main() {
 	flag.Parse()
 	if len(file) == 0 {
 		flag.PrintDefaults()
-		os.Exit(1)
+		exit(nil)
 	}
 
 	wd, err := os.Getwd()
 	if err != nil {
 		fmt.Fprintf(os.Stderr, err.Error())
+		exit(err)
 	}
 	data, err := ioutil.ReadFile(path.Join(wd, file))
 	if err != nil {
-		fmt.Fprintf(os.Stderr, err.Error())
+		exit(err)
 	}
 
 	var interfaces []InterfaceDesc
 	err = json.Unmarshal(data, &interfaces)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, err.Error())
+		exit(err)
 	}
 	for _, desc := range interfaces {
 		var body []byte
 		if desc.Body != nil {
 			body, err = json.Marshal(desc.Body)
 			if err != nil {
-				fmt.Fprintf(os.Stderr, err.Error())
-				os.Exit(1)
+				exit(err)
 			}
 		}
 		http.HandleFunc(desc.URI, func(w http.ResponseWriter, r *http.Request) {
@@ -91,6 +91,14 @@ func main() {
 
 	err = http.ListenAndServe(host, nil)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "ListenAndServe on(%s) error: %v", host, err)
+		err = fmt.Errorf("ListenAndServe on(%s) error: %v", host, err)
+		exit(err)
 	}
+}
+
+func exit(err error) {
+	if err != nil {
+		fmt.Fprintf(os.Stderr, err.Error())
+	}
+	os.Exit(1)
 }
