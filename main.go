@@ -55,7 +55,6 @@ func main() {
 
 	wd, err := os.Getwd()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, err.Error())
 		exit(err)
 	}
 	data, err := ioutil.ReadFile(path.Join(wd, file))
@@ -78,7 +77,7 @@ func main() {
 		}
 		http.HandleFunc(desc.URI, func(w http.ResponseWriter, r *http.Request) {
 			time.Sleep(desc.Latency.CalcDuration())
-			w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+			w.Header().Set("Content-Type", "application/json")
 			for k, v := range desc.Header {
 				w.Header().Set(k, v)
 			}
