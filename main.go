@@ -13,7 +13,7 @@ import (
 )
 
 type Latency struct {
-	Average int `json:"Average"`
+	Average int `json:"average"`
 	Delta   int `json:"delta"`
 }
 
@@ -35,6 +35,7 @@ const pattern = `
 uri=%s
 statusCode=%d
 body=%s
+latency=%s
 `
 
 var file string
@@ -86,7 +87,12 @@ func main() {
 				w.Write(body)
 			}
 		})
-		fmt.Printf(pattern, desc.URI, desc.StatusCode, string(body))
+		fmt.Printf(pattern,
+			desc.URI,
+			desc.StatusCode,
+			string(body),
+			fmt.Sprintf("[latency:%d,delta:%d]", desc.Latency.Average, desc.Latency.Delta),
+		)
 	}
 
 	err = http.ListenAndServe(host, nil)
