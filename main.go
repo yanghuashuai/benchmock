@@ -23,7 +23,7 @@ func (l Latency) CalcDuration() time.Duration {
 }
 
 type InterfaceDesc struct {
-	Uri        string            `json:"uri"`
+	URI        string            `json:"uri"`
 	StatusCode int               `json:"statusCode"`
 	Header     map[string]string `json:"header"`
 	Body       interface{}       `json:"body"`
@@ -54,28 +54,28 @@ func main() {
 
 	wd, err := os.Getwd()
 	if err != nil {
-		fmt.Errorf(err.Error())
+		fmt.Fprintf(os.Stderr, err.Error())
 	}
 	data, err := ioutil.ReadFile(path.Join(wd, file))
 	if err != nil {
-		fmt.Errorf(err.Error())
+		fmt.Fprintf(os.Stderr, err.Error())
 	}
 
 	var interfaces []InterfaceDesc
 	err = json.Unmarshal(data, &interfaces)
 	if err != nil {
-		fmt.Errorf(err.Error())
+		fmt.Fprintf(os.Stderr, err.Error())
 	}
 	for _, desc := range interfaces {
 		var body []byte
 		if desc.Body != nil {
 			body, err = json.Marshal(desc.Body)
 			if err != nil {
-				fmt.Errorf(err.Error())
+				fmt.Fprintf(os.Stderr, err.Error())
 				os.Exit(1)
 			}
 		}
-		http.HandleFunc(desc.Uri, func(w http.ResponseWriter, r *http.Request) {
+		http.HandleFunc(desc.URI, func(w http.ResponseWriter, r *http.Request) {
 			time.Sleep(desc.Latency.CalcDuration())
 			w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 			for k, v := range desc.Header {
@@ -86,11 +86,11 @@ func main() {
 				w.Write(body)
 			}
 		})
-		fmt.Printf(pattern, desc.Uri, desc.StatusCode, string(body))
+		fmt.Printf(pattern, desc.URI, desc.StatusCode, string(body))
 	}
 
 	err = http.ListenAndServe(host, nil)
 	if err != nil {
-		fmt.Errorf("ListenAndServe on(%s) error: %v", host, err)
+		fmt.Fprintf(os.Stderr, "ListenAndServe on(%s) error: %v", host, err)
 	}
 }
