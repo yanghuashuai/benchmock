@@ -1,0 +1,14 @@
+[
+    {
+        "uri": "/hello",
+        "statusCode": 200,
+        "body": {
+            "code": 0,
+            "message": "world"
+        },
+        "latency": {
+            "average": 10,
+            "delta": 5
+        }
+    }
+]
